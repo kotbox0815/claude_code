@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>CDP Report importieren</h1>
+
+<form id="upload-form">
+  <input type="file" id="file" name="file" accept=".csv" required>
+  <button type="submit">Hochladen</button>
+</form>
+
+<p id="upload-result"></p>
+
+<script>
+document.getElementById("upload-form").addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const fileInput = document.getElementById("file");
+  const resultEl = document.getElementById("upload-result");
+  if (!fileInput.files.length) return;
+
+  const formData = new FormData();
+  formData.append("file", fileInput.files[0]);
+
+  resultEl.textContent = "Import läuft...";
+  const res = await fetch("/api/reports/upload", { method: "POST", body: formData });
+  const data = await res.json();
+
+  if (data.error) {
+    resultEl.textContent = "Fehler: " + data.error;
+  } else {
+    resultEl.textContent = `Import erfolgreich: ${data.filename} – ${data.row_count} Zeilen importiert (Report #${data.id}).`;
+  }
+});
+</script>
+{% endblock %}

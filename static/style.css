@@ -1,0 +1,55 @@
+body {
+  font-family: sans-serif;
+  margin: 0;
+  background: #f7f7f9;
+}
+
+.navbar {
+  background: #2d3748;
+  padding: 1rem;
+}
+
+.navbar a {
+  color: white;
+  margin-right: 1.5rem;
+  text-decoration: none;
+  font-weight: bold;
+}
+
+main {
+  padding: 1.5rem;
+}
+
+.filters {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  margin-bottom: 1rem;
+}
+
+.filters input,
+.filters select {
+  padding: 0.4rem;
+}
+
+table {
+  border-collapse: collapse;
+  width: 100%;
+  background: white;
+}
+
+th, td {
+  border: 1px solid #ddd;
+  padding: 0.4rem 0.6rem;
+  text-align: left;
+  font-size: 0.9rem;
+}
+
+th {
+  background: #edf2f7;
+}
+
+.host-link {
+  cursor: pointer;
+  color: #2b6cb0;
+}

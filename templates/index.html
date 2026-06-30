@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>CDP Einträge durchsuchen</h1>
+
+<div class="filters">
+  <input type="text" id="q" placeholder="Volltextsuche (Host, MAC, DeviceID, Port, ...)">
+  <input type="text" id="host" placeholder="Host">
+  <select id="cluster"><option value="">Alle Cluster</option></select>
+  <select id="vswitch"><option value="">Alle vSwitches</option></select>
+  <input type="text" id="device_id" placeholder="DeviceID / Switch">
+  <button id="search-btn">Suchen</button>
+</div>
+
+<p id="result-count"></p>
+
+<table id="result-table">
+  <thead>
+    <tr>
+      <th>Host</th><th>Cluster</th><th>vSwitch</th><th>PNic</th>
+      <th>Speed</th><th>MAC</th><th>DeviceID</th><th>PortID</th>
+    </tr>
+  </thead>
+  <tbody></tbody>
+</table>
+
+<script src="/static/app.js"></script>
+{% endblock %}

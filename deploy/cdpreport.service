@@ -1,0 +1,16 @@
+[Unit]
+Description=CDP Report Suchportal
+After=network.target
+
+[Service]
+Type=simple
+User=cdpreport
+Group=cdpreport
+WorkingDirectory=/opt/cdpreport
+Environment="DATABASE_URL=sqlite:////opt/cdpreport/data/cdpreport.db"
+ExecStart=/opt/cdpreport/venv/bin/uvicorn backend.main:app --host 0.0.0.0 --port 8000
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target
