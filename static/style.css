@@ -1,23 +1,53 @@
+:root {
+  --bg:        #1e2330;
+  --surface:   #272d3d;
+  --surface2:  #2f3649;
+  --border:    #3a4256;
+  --text:      #d0d6e8;
+  --text-muted:#7d89a6;
+  --accent:    #5b8dee;
+  --accent-dim:#3a5fa8;
+  --nav-bg:    #161b27;
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+
 body {
   font-family: sans-serif;
   margin: 0;
-  background: #f7f7f9;
+  background: var(--bg);
+  color: var(--text);
 }
 
 .navbar {
-  background: #2d3748;
-  padding: 1rem;
+  background: var(--nav-bg);
+  padding: 0.85rem 1.5rem;
+  display: flex;
+  gap: 1.5rem;
+  align-items: center;
+  border-bottom: 1px solid var(--border);
 }
 
 .navbar a {
-  color: white;
-  margin-right: 1.5rem;
+  color: var(--text-muted);
   text-decoration: none;
-  font-weight: bold;
+  font-weight: 600;
+  font-size: 0.95rem;
+  transition: color 0.15s;
+}
+
+.navbar a:hover {
+  color: var(--text);
 }
 
 main {
   padding: 1.5rem;
+}
+
+h1 {
+  font-size: 1.25rem;
+  margin: 0 0 1rem;
+  color: var(--text);
 }
 
 .filters {
@@ -29,27 +59,115 @@ main {
 
 .filters input,
 .filters select {
-  padding: 0.4rem;
+  padding: 0.4rem 0.6rem;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  color: var(--text);
+  border-radius: 4px;
+  font-size: 0.9rem;
+}
+
+.filters input::placeholder {
+  color: var(--text-muted);
+}
+
+.filters input:focus,
+.filters select:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
+.filters select option {
+  background: var(--surface2);
+}
+
+button {
+  padding: 0.4rem 0.9rem;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  font-weight: 600;
+  transition: background 0.15s;
+}
+
+#search-btn {
+  background: var(--accent);
+  color: #fff;
+}
+
+#search-btn:hover {
+  background: var(--accent-dim);
+}
+
+#reset-btn {
+  background: var(--surface2);
+  color: var(--text-muted);
+  border: 1px solid var(--border);
+}
+
+#reset-btn:hover {
+  color: var(--text);
+  border-color: var(--text-muted);
+}
+
+#result-count {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  margin-bottom: 0.5rem;
 }
 
 table {
   border-collapse: collapse;
   width: 100%;
-  background: white;
+  background: var(--surface);
+  border-radius: 6px;
+  overflow: hidden;
+  font-size: 0.88rem;
 }
 
 th, td {
-  border: 1px solid #ddd;
-  padding: 0.4rem 0.6rem;
+  border: 1px solid var(--border);
+  padding: 0.45rem 0.7rem;
   text-align: left;
-  font-size: 0.9rem;
 }
 
 th {
-  background: #edf2f7;
+  background: var(--surface2);
+  color: var(--text-muted);
+  font-weight: 600;
+  text-transform: uppercase;
+  font-size: 0.75rem;
+  letter-spacing: 0.04em;
+}
+
+tr:hover td {
+  background: var(--surface2);
 }
 
 .host-link {
   cursor: pointer;
-  color: #2b6cb0;
+  color: var(--accent);
+}
+
+.host-link:hover {
+  text-decoration: underline;
+}
+
+/* Upload / Reports pages */
+form {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  flex-wrap: wrap;
+  margin-bottom: 1rem;
+}
+
+input[type="file"] {
+  color: var(--text);
+}
+
+#upload-result {
+  color: var(--text-muted);
+  font-size: 0.9rem;
 }
