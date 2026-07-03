@@ -1,7 +1,7 @@
 from pathlib import Path
 
 from fastapi import Depends, FastAPI, File, Request, UploadFile
-from fastapi.responses import HTMLResponse
+from fastapi.responses import HTMLResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from sqlalchemy import or_, select
@@ -149,6 +149,14 @@ def get_entry(entry_id: int, db: Session = Depends(get_db)):
         "device_serial": entry.device_serial,
         "port_id": entry.port_id,
     }
+
+
+@app.delete("/api/reset")
+def reset_database(db: Session = Depends(get_db)):
+    db.query(CdpEntry).delete()
+    db.query(Report).delete()
+    db.commit()
+    return JSONResponse({"ok": True, "message": "Datenbank wurde geleert."})
 
 
 @app.get("/api/facets")

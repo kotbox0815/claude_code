@@ -44,6 +44,29 @@ def test_import_csv_creates_report_and_entries(db_session):
     assert first.device_serial == "FDO260211XJ"
 
 
+def test_import_skips_rows_without_vswitch(db_session):
+    # Build a CSV where one row has an empty vSwitch
+    csv_content = (
+        '"Host";"Cluster";"vSwitch";"PNic";"Speed";"MAC";"DeviceID";"PortID"\n'
+        '"host1";"cl1";"";"vmnic0";"10000";"aa:bb:cc:dd:ee:ff";"sw1(SN1)";"Eth1/1"\n'
+        '"host1";"cl1";"vds1";"vmnic1";"10000";"aa:bb:cc:dd:ee:f0";"sw1(SN1)";"Eth1/2"\n'
+    ).encode()
+    report = import_csv(db_session, filename="test.csv", content=csv_content)
+    assert report.row_count == 1  # row without vSwitch skipped
+
+
+def test_import_stores_empty_device_id(db_session):
+    csv_content = (
+        '"Host";"Cluster";"vSwitch";"PNic";"Speed";"MAC";"DeviceID";"PortID"\n'
+        '"host1";"cl1";"vds1";"vmnic0";"10000";"aa:bb:cc:dd:ee:ff";"";""\n'
+    ).encode()
+    report = import_csv(db_session, filename="test.csv", content=csv_content)
+    assert report.row_count == 1
+    entry = db_session.query(CdpEntry).filter_by(report_id=report.id).first()
+    assert entry.device_id == ""
+    assert entry.port_id == ""
+
+
 def test_import_csv_rejects_bad_header(db_session):
     bad_content = b'"Foo";"Bar"\n"x";"y"\n'
     with pytest.raises(CdpImportError):

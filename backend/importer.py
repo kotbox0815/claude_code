@@ -43,7 +43,12 @@ def import_csv(db: Session, filename: str, content: bytes, source_host: str | No
         if len(row) != len(EXPECTED_HEADER):
             continue
         host, cluster, vswitch, pnic, speed, mac, device_id, port_id = (cell.strip() for cell in row)
-        device_name, device_serial = parse_device_id(device_id)
+
+        # Skip pnics that have no vSwitch assignment
+        if not vswitch:
+            continue
+
+        device_name, device_serial = parse_device_id(device_id) if device_id else (None, None)
         entry = CdpEntry(
             report_id=report.id,
             host=host,
@@ -52,9 +57,9 @@ def import_csv(db: Session, filename: str, content: bytes, source_host: str | No
             pnic=pnic,
             speed=speed,
             mac=mac,
-            device_id=device_id,
+            device_id=device_id,      # empty string = missing, rendered as "Missing" in UI
             device_serial=device_serial,
-            port_id=port_id,
+            port_id=port_id,           # empty string = missing
         )
         db.add(entry)
         count += 1

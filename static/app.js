@@ -46,6 +46,7 @@ async function runSearch() {
   tbody.innerHTML = "";
   for (const e of data.items) {
     const tr = document.createElement("tr");
+    const missing = '<span class="missing">Missing</span>';
     tr.innerHTML = `
       <td class="host-link" data-host="${e.host}">${e.host}</td>
       <td>${e.cluster}</td>
@@ -53,8 +54,8 @@ async function runSearch() {
       <td>${e.pnic}</td>
       <td>${e.speed}</td>
       <td>${e.mac}</td>
-      <td>${e.device_id}</td>
-      <td>${e.port_id}</td>
+      <td>${e.device_id || missing}</td>
+      <td>${e.port_id || missing}</td>
     `;
     tbody.appendChild(tr);
   }

@@ -77,6 +77,19 @@ def test_search_entries_filters(client):
     assert data["total"] == 4
 
 
+def test_reset_database(client):
+    upload_fixture(client)
+    res = client.delete("/api/reset")
+    assert res.status_code == 200
+    assert res.json()["ok"] is True
+
+    res = client.get("/api/reports")
+    assert res.json() == []
+
+    res = client.get("/api/entries")
+    assert res.json()["total"] == 0
+
+
 def test_facets(client):
     upload_fixture(client)
     res = client.get("/api/facets")

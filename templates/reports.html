@@ -9,6 +9,13 @@
   <tbody></tbody>
 </table>
 
+<div class="danger-zone">
+  <h2>Datenbank leeren</h2>
+  <p>Entfernt alle importierten Reports und Einträge unwiderruflich.</p>
+  <button id="reset-db-btn" class="btn-danger">Alle Daten löschen</button>
+  <p id="reset-result"></p>
+</div>
+
 <script>
 async function loadReports() {
   const res = await fetch("/api/reports");
@@ -27,6 +34,19 @@ async function loadReports() {
     tbody.appendChild(tr);
   }
 }
+
+document.getElementById("reset-db-btn").addEventListener("click", async () => {
+  const confirmed = window.confirm(
+    "Wirklich alle Reports und Einträge unwiderruflich löschen?\n\nDieser Vorgang kann nicht rückgängig gemacht werden."
+  );
+  if (!confirmed) return;
+
+  const res = await fetch("/api/reset", { method: "DELETE" });
+  const data = await res.json();
+  document.getElementById("reset-result").textContent = data.message || "Datenbank geleert.";
+  loadReports();
+});
+
 loadReports();
 </script>
 {% endblock %}
