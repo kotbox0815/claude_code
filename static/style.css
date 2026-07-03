@@ -159,12 +159,6 @@ a:visited {
   color: var(--visited);
 }
 
-.direct-attached {
-  color: #7ec8a4;
-  font-style: italic;
-  font-size: 0.85rem;
-}
-
 .missing {
   color: #e05252;
   font-weight: 600;
