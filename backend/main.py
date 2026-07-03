@@ -92,19 +92,21 @@ def list_entries(
         stmt = stmt.where(CdpEntry.device_id.ilike(f"%{device_id}%"))
     if q:
         like = f"%{q}%"
-        stmt = stmt.where(
-            or_(
-                CdpEntry.host.ilike(like),
-                CdpEntry.cluster.ilike(like),
-                CdpEntry.vswitch.ilike(like),
-                CdpEntry.pnic.ilike(like),
-                CdpEntry.speed.ilike(like),
-                CdpEntry.mac.ilike(like),
-                CdpEntry.device_id.ilike(like),
-                CdpEntry.device_serial.ilike(like),
-                CdpEntry.port_id.ilike(like),
-            )
-        )
+        conditions = [
+            CdpEntry.host.ilike(like),
+            CdpEntry.cluster.ilike(like),
+            CdpEntry.vswitch.ilike(like),
+            CdpEntry.pnic.ilike(like),
+            CdpEntry.speed.ilike(like),
+            CdpEntry.mac.ilike(like),
+            CdpEntry.device_id.ilike(like),
+            CdpEntry.device_serial.ilike(like),
+            CdpEntry.port_id.ilike(like),
+        ]
+        if "missing" in q.lower():
+            conditions.append(CdpEntry.device_id == "")
+            conditions.append(CdpEntry.port_id == "")
+        stmt = stmt.where(or_(*conditions))
 
     total = len(db.scalars(stmt).all())
     stmt = stmt.order_by(CdpEntry.host, CdpEntry.pnic).limit(limit).offset(offset)
