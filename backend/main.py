@@ -4,7 +4,7 @@ from fastapi import Depends, FastAPI, File, Request, UploadFile
 from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
-from sqlalchemy import or_, select
+from sqlalchemy import func, or_, select
 from sqlalchemy.orm import Session
 
 from backend.database import Base, engine, get_db
@@ -149,6 +149,92 @@ def get_entry(entry_id: int, db: Session = Depends(get_db)):
         "device_serial": entry.device_serial,
         "port_id": entry.port_id,
     }
+
+
+@app.get("/missing", response_class=HTMLResponse)
+def missing_page(request: Request):
+    return templates.TemplateResponse(request, "missing.html")
+
+
+@app.get("/api/missing-pnics")
+def missing_pnics(db: Session = Depends(get_db)):
+    # Find the latest report per source_host (NULL treated as empty string to allow JOIN).
+    src = func.coalesce(Report.source_host, "")
+    latest_per_source = (
+        select(
+            src.label("src_key"),
+            func.max(Report.imported_at).label("max_ts"),
+        )
+        .group_by(src)
+        .subquery()
+    )
+    latest_reports = db.scalars(
+        select(Report).join(
+            latest_per_source,
+            (func.coalesce(Report.source_host, "") == latest_per_source.c.src_key)
+            & (Report.imported_at == latest_per_source.c.max_ts),
+        )
+    ).all()
+
+    if not latest_reports:
+        return []
+
+    result = []
+    for latest in latest_reports:
+        # host+pnic combos present in the latest report for this source_host
+        current_pairs = set(
+            db.execute(
+                select(CdpEntry.host, CdpEntry.pnic).where(
+                    CdpEntry.report_id == latest.id
+                )
+            ).all()
+        )
+
+        # All older reports for the same source_host
+        src_filter = (
+            Report.source_host.is_(None)
+            if latest.source_host is None
+            else Report.source_host == latest.source_host
+        )
+        older_reports = db.scalars(
+            select(Report).where(src_filter, Report.id != latest.id)
+        ).all()
+
+        # Collect host+pnic combos missing from the latest report
+        seen: dict[tuple, dict] = {}
+        for old_report in older_reports:
+            rows = db.execute(
+                select(
+                    CdpEntry.host,
+                    CdpEntry.pnic,
+                    CdpEntry.device_id,
+                    CdpEntry.port_id,
+                    CdpEntry.vswitch,
+                ).where(CdpEntry.report_id == old_report.id)
+            ).all()
+            for row in rows:
+                key = (row.host, row.pnic)
+                if key not in current_pairs:
+                    # Keep the entry from the most recent old report
+                    if key not in seen or old_report.imported_at > seen[key]["last_seen_at"]:
+                        seen[key] = {
+                            "host": row.host,
+                            "pnic": row.pnic,
+                            "vswitch": row.vswitch,
+                            "device_id": row.device_id,
+                            "port_id": row.port_id,
+                            "last_seen_report_id": old_report.id,
+                            "last_seen_filename": old_report.filename,
+                            "last_seen_at": old_report.imported_at,
+                            "current_report_id": latest.id,
+                        }
+
+        for item in seen.values():
+            item["last_seen_at"] = item["last_seen_at"].isoformat()
+            result.append(item)
+
+    result.sort(key=lambda x: (x["host"], x["pnic"]))
+    return result
 
 
 @app.get("/api/facets")

@@ -159,6 +159,39 @@ a:visited {
   color: var(--visited);
 }
 
+/* Missing PNICs page */
+.nav-warn {
+  color: #e0a050 !important;
+}
+
+.page-desc {
+  color: var(--text-muted);
+  font-size: 0.9rem;
+  margin-bottom: 1rem;
+}
+
+#missing-count {
+  font-size: 0.9rem;
+  margin-bottom: 0.75rem;
+}
+
+#missing-count.warn {
+  color: #e0a050;
+  font-weight: 600;
+}
+
+#missing-count.ok {
+  color: #4caf7d;
+}
+
+tr.missing-row td {
+  border-left: 3px solid #e0a050;
+}
+
+tr.missing-row:first-child td {
+  border-left-color: #e0a050;
+}
+
 /* Upload / Reports pages */
 form {
   display: flex;
