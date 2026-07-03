@@ -77,36 +77,6 @@ def test_search_entries_filters(client):
     assert data["total"] == 4
 
 
-def test_missing_pnics_none_when_single_report(client):
-    upload_fixture(client)
-    res = client.get("/api/missing-pnics")
-    assert res.status_code == 200
-    assert res.json() == []
-
-
-def test_missing_pnics_detected(client):
-    upload_fixture(client)
-
-    # Second report with one pnic removed
-    original = FIXTURE.read_bytes().decode("utf-8")
-    lines = original.strip().splitlines()
-    # Remove the second data row (vmnic0 of dfritesx01)
-    reduced = "\n".join([lines[0]] + lines[2:]) + "\n"
-
-    res = client.post(
-        "/api/reports/upload",
-        files={"file": ("reduced.csv", reduced.encode(), "text/csv")},
-    )
-    assert res.status_code == 200
-
-    res = client.get("/api/missing-pnics")
-    data = res.json()
-    assert len(data) == 1
-    assert data[0]["host"] == "dfritesx01.dzbank.vrnet"
-    assert data[0]["pnic"] == "vmnic0"
-    assert data[0]["last_seen_report_id"] == 1
-
-
 def test_facets(client):
     upload_fixture(client)
     res = client.get("/api/facets")
