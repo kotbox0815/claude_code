@@ -35,6 +35,24 @@ function buildParams() {
   return params;
 }
 
+// Switch DeviceIDs always end with (SERIALNUMBER). A DeviceID without
+// parentheses is a hostname (direct-attached neighbor).
+function isHostname(deviceId) {
+  return deviceId && !/\(.*\)$/.test(deviceId);
+}
+
+function renderDeviceId(deviceId, pnic) {
+  if (!deviceId) return '<span class="missing">Missing</span>';
+  if (isHostname(deviceId)) return `<span class="direct-attached">Direct attached@${deviceId}</span>`;
+  return deviceId;
+}
+
+function renderPortId(portId, deviceId, pnic) {
+  if (isHostname(deviceId)) return `<span class="direct-attached">Direct attached@${pnic}</span>`;
+  if (!portId) return '<span class="missing">Missing</span>';
+  return portId;
+}
+
 async function runSearch() {
   const params = buildParams();
   const res = await fetch("/api/entries?" + params.toString());
@@ -46,7 +64,6 @@ async function runSearch() {
   tbody.innerHTML = "";
   for (const e of data.items) {
     const tr = document.createElement("tr");
-    const missing = '<span class="missing">Missing</span>';
     tr.innerHTML = `
       <td class="host-link" data-host="${e.host}">${e.host}</td>
       <td>${e.cluster}</td>
@@ -54,8 +71,8 @@ async function runSearch() {
       <td>${e.pnic}</td>
       <td>${e.speed}</td>
       <td>${e.mac}</td>
-      <td>${e.device_id || missing}</td>
-      <td>${e.port_id || missing}</td>
+      <td>${renderDeviceId(e.device_id, e.pnic)}</td>
+      <td>${renderPortId(e.port_id, e.device_id, e.pnic)}</td>
     `;
     tbody.appendChild(tr);
   }
