@@ -68,6 +68,15 @@ async function runSearch() {
 }
 
 document.getElementById("search-btn").addEventListener("click", runSearch);
+document.getElementById("reset-btn").addEventListener("click", () => {
+  document.getElementById("q").value = "";
+  document.getElementById("host").value = "";
+  document.getElementById("cluster").value = "";
+  document.getElementById("vswitch").value = "";
+  document.getElementById("device_id").value = "";
+  history.replaceState(null, "", "/");
+  runSearch();
+});
 document.getElementById("q").addEventListener("keydown", (e) => {
   if (e.key === "Enter") runSearch();
 });
