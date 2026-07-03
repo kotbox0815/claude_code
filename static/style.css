@@ -8,6 +8,7 @@
   --accent:    #5b8dee;
   --accent-dim:#3a5fa8;
   --nav-bg:    #161b27;
+  --visited:   #4caf7d;
 }
 
 *, *::before, *::after { box-sizing: border-box; }
@@ -152,6 +153,10 @@ tr:hover td {
 
 .host-link:hover {
   text-decoration: underline;
+}
+
+a:visited {
+  color: var(--visited);
 }
 
 /* Upload / Reports pages */
